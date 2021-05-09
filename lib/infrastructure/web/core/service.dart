@@ -36,7 +36,15 @@ class WebServiceImpl implements WebService {
   @override
   Future<Response<dynamic>> execute<T extends WebRequest>(T request) async {
     final Dio dio = await _dio;
-    return await dio.request<dynamic>(request.path, data: request.data, queryParameters: request.queryParameters);
+    return await dio.request<dynamic>(
+      request.path,
+      data: request.data,
+      queryParameters: request.queryParameters,
+      options: Options(
+        method: request.httpMethod.value,
+        headers: request.httpHeaders,
+      ),
+    );
   }
 
   void refresh() {
