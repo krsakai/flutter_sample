@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; //非同期処理用
-import 'dart:convert'; //httpレスポンスをJSON形式に変換用
+import 'package:dio/dio.dart';
+import 'dart:async';
+import 'dart:convert';
 
 void main() => runApp(MyApp());
 
