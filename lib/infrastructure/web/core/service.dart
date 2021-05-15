@@ -13,12 +13,10 @@ abstract class WebService {
 }
 
 class WebServiceImpl implements WebService {
-  WebServiceImpl() {
-    _dio = _makeDio();
-  }
+  WebServiceImpl() : _dio = _makeDio();
 
   Future<Dio> _dio;
-
+  
   static Future<Dio> _makeDio() async {
     final Dio dio = Dio();
     dio.options.connectTimeout = 15000;

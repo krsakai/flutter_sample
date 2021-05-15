@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_application_1/application.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import 'dart:convert';
 
-void main() => runApp(MyApp());
+Future<void> main() async {
+  runApp(
+    Provider<String>.value(value: "environment", child: Application()),
+  );
+}
 
 class MyApp extends StatelessWidget {
+
+  static const routeName = '/';
+
   @override
   Widget build(BuildContext context) {
     var list = [
@@ -16,26 +25,22 @@ class MyApp extends StatelessWidget {
       "メッセージ5",
       "メッセージ6",
     ];
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('ListView'),
-        ),
-        body: ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (BuildContext context, int index) {
-            return messageItem(list[index]);
-          },
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('ListView'),
+      ),
+      body: ListView.builder(
+        itemCount: list.length,
+        itemBuilder: (BuildContext context, int index) {
+          return messageItem(list[index]);
+        },
       ),
     );
   }
 
   Widget messageItem(String title) {
     return Container(
-      decoration: new BoxDecoration(
-          border:
-              new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
+      decoration: new BoxDecoration(border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
       child: ListTile(
         title: Text(
           title,
