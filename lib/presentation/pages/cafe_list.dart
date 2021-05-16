@@ -1,18 +1,23 @@
-import 'dart:math';
-
 import 'package:flutter_application_1/domain/entities/cafe.dart';
-import 'package:flutter_application_1/domain/repositories/cafe.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quiver/core.dart';
+
+import 'package:flutter_application_1/presentation/arguments/cafe_list.dart';
+import 'package:flutter_application_1/presentation/arguments/cafe_location_map.dart';
+import 'package:flutter_application_1/presentation/model/cafe_list.dart';
+import 'package:flutter_application_1/presentation/pages/cafe_location_map.dart';
 
 class CafeListPage extends StatelessWidget {
   const CafeListPage() : super();
 
   static const routeName = '/cafeList';
 
-  static Widget provide() => ChangeNotifierProvider<CafeListPageModel>(
-    create: (BuildContext context) => CafeListPageModel(cafeRepository: Provider.of(context, listen: false))..initialize(),
+  static Widget provide(CafeListPageArguments arguments) => ChangeNotifierProvider<CafeListPageModel>(
+    create: (BuildContext context) => CafeListPageModel(
+      cafeRepository: Provider.of(context, listen: false),
+      lat: arguments.lat,
+      lon: arguments.lon
+    )..initialize(),
     child: const CafeListPage()
   );
 
@@ -26,69 +31,65 @@ class CafeListPage extends StatelessWidget {
       body: ListView.builder(
         itemCount: model.cafeList.length,
         itemBuilder: (BuildContext context, int index) {
-          return messageItem(model.cafeList[index].name);
+          return PictureCard(model.cafeList[index]);
         },
-      ),
-    );
-  }
-
-  Widget messageItem(String title) {
-    return Container(
-      decoration: new BoxDecoration(border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))),
-      child: ListTile(
-        title: Text(
-          title,
-          style: TextStyle(color: Colors.black, fontSize: 18.0),
-        ),
-        onTap: () {
-          print("onTap called.");
-        }, // タップ
-        onLongPress: () {
-          print("onLongTap called.");
-        }, // 長押し
       ),
     );
   }
 }
 
-/// スポット一覧用ViewModel。
-@visibleForTesting
-class CafeListPageModel with ChangeNotifier {
-  CafeListPageModel({required this.cafeRepository});
+class PictureCard extends StatelessWidget {
 
-  final CafeRepository cafeRepository;
+  final Cafe cafe;
 
-  List<Cafe> cafeList = [];
-
-  Future<void> initialize() async {
-    await fetchCafeList();
-  }
-
-  /// スポットの一覧を取得する。
-  Future<void> fetchCafeList() async {
-    notifyListeners();
-
-    try {
-      cafeList = await cafeRepository.cafeList();
-    } on Exception catch (exception) {
-      throw exception;
-    }
-    notifyListeners();
-  }
-
-  /// 現在保持している情報をリセットする。
-  void clearSpotInfo() {
-    cafeList = <Cafe>[];
-  }
-
-  /// disposeされていない場合にnotifyListenersを呼び出す。
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
-  }
+  PictureCard(this.cafe);
 
   @override
-  void dispose() {
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () async {
+          await Navigator.pushNamed<void>(
+            context, 
+            CafeLocationMapPage.routeName,
+            arguments: CafeLocationMapPageArguments(
+              lat: cafe.lat,
+              lon: cafe.lon,
+              name: cafe.name,
+              ),
+            );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black45),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              ListTile(
+                leading: Image.network(cafe.iconUrl),
+                title: Text(cafe.name),
+                subtitle: Text(cafe.vicinity),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.network((cafe.photoUrl ?? "https://image.shutterstock.com/image-vector/picture-vector-icon-no-image-600w-1350441335.jpg?key=") + "AIzaSyAxJ7Y2IMFTBs-68uiEK9RwSjNaTIPCvjA")
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text("評価"),
+                  Container(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text((cafe.rating ?? 0).toString())
+                  )
+                ])
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

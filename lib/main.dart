@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_application_1/application.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import 'dart:convert';
 
 Future<void> main() async {
   runApp(
